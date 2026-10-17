@@ -37,9 +37,31 @@ export const initSocket = (httpServer) => {
       socket.to(roomCode).emit("typing", socket.userName);
     });
 
+    // WebRTC signaling: the server only relays small messages between peers
+    socket.on("rtc-ready", (roomCode) => {
+      socket.to(roomCode).emit("rtc-peer-joined", socket.id);
+    });
+
+    socket.on("rtc-offer", ({ to, offer }) => {
+      io.to(to).emit("rtc-offer", { from: socket.id, offer });
+    });
+
+    socket.on("rtc-answer", ({ to, answer }) => {
+      io.to(to).emit("rtc-answer", { from: socket.id, answer });
+    });
+
+    socket.on("rtc-ice", ({ to, candidate }) => {
+      io.to(to).emit("rtc-ice", { from: socket.id, candidate });
+    });
+
+    socket.on("rtc-leave", (roomCode) => {
+      socket.to(roomCode).emit("rtc-peer-left", socket.id);
+    });
+
     socket.on("disconnecting", () => {
       for (const room of socket.rooms) {
         socket.to(room).emit("system", `${socket.userName} left`);
+        socket.to(room).emit("rtc-peer-left", socket.id);
       }
     });
   });
