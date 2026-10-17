@@ -1,3 +1,4 @@
+import MeetingRoom from "./pages/MeetingRoom";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/meeting/:roomCode" element={<Protected><MeetingRoom /></Protected>} />
       </Routes>
     </BrowserRouter>
   );
